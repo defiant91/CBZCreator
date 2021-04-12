@@ -28,6 +28,10 @@ namespace CBZCreator
                 {
                     var coverSavedLocation = CoverFetcher.DownloadCover(Globals.InputArgs.ISBN, Globals.InputArgs.InputFolderPath, Globals.InputArgs.GoogleSearchAPIKey);
                 }
+                else if (!string.IsNullOrWhiteSpace(Globals.InputArgs.VolumeCoverPath))
+                {
+                    File.Copy(Globals.InputArgs.VolumeCoverPath, $"{Globals.InputArgs.InputFolderPath}\\0000_cover{Path.GetExtension(Globals.InputArgs.VolumeCoverPath)}");
+                }
 
                 if (!CreateZip())
                 {
