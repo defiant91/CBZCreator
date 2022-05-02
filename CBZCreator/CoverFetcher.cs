@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Net;
+using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
+
 using Google.Apis.CustomSearchAPI.v1;
 using Google.Apis.Services;
 
@@ -48,12 +50,19 @@ namespace CBZCreator
 
             try
             {
-                string ext = link.Substring(link.LastIndexOf('.'), link.Length - link.LastIndexOf('.'));
+                string ext = link[link.LastIndexOf('.')..];
                 string saveTo = $"{downloadLocation}\\0000_cover{ext}";
 
-                using (WebClient client = new WebClient())
+                using (var httpClient = new HttpClient() { BaseAddress = new Uri(link), })
                 {
-                    await client.DownloadFileTaskAsync(new Uri(link), saveTo);
+                    var resp = await httpClient.SendAsync(new HttpRequestMessage());
+                    
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        throw new Exception($"HTTP response code: {resp.StatusCode}");
+                    }
+
+                    await File.WriteAllBytesAsync(saveTo, await resp.Content.ReadAsByteArrayAsync());
                 }
 
                 Console.WriteLine("Cover downloaded successfully!");
